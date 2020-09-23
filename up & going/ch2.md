@@ -1,19 +1,9 @@
 # You Don't Know JS: Up & Going
 # Chapter 2: Into JavaScript
 
-In the previous chapter, I introduced the basic building blocks of programming, such as variables, loops, conditionals, and functions. Of course, all the code shown has been in JavaScript. But in this chapter, we want to focus specifically on things you need to know about JavaScript to get up and going as a JS developer.
-
-We will introduce quite a few concepts in this chapter that will not be fully explored until subsequent *YDKJS* books. You can think of this chapter as an overview of the topics covered in detail throughout the rest of this series.
-
-Especially if you're new to JavaScript, you should expect to spend quite a bit of time reviewing the concepts and code examples here multiple times. Any good foundation is laid brick by brick, so don't expect that you'll immediately understand it all the first pass through.
-
-Your journey to deeply learn JavaScript starts here.
-
-**Note:** As I said in Chapter 1, you should definitely try all this code yourself as you read and work through this chapter. Be aware that some of the code here assumes capabilities introduced in the newest version of JavaScript at the time of this writing (commonly referred to as "ES6" for the 6th edition of ECMAScript -- the official name of the JS specification). If you happen to be using an older, pre-ES6 browser, the code may not work. A recent update of a modern browser (like Chrome, Firefox, or IE) should be used.
-
 ## Values & Types
 
-As we asserted in Chapter 1, JavaScript has typed values, not typed variables. The following built-in types are available:
+JavaScript has typed values, not typed variables. The following built-in types are available:
 
 * `string`
 * `number`
@@ -38,7 +28,7 @@ a = true;
 typeof a;				// "boolean"
 
 a = null;
-typeof a;				// "object" -- weird, bug
+typeof a;				// "object" -- (bug in JS)
 
 a = undefined;
 typeof a;				// "undefined"
@@ -47,57 +37,13 @@ a = { b: "c" };
 typeof a;				// "object"
 ```
 
-The return value from the `typeof` operator is always one of six (seven as of ES6! - the "symbol" type) string values. That is, `typeof "abc"` returns `"string"`, not `string`.
+The return value from the `typeof` operator is always one of seven string values.
 
-Notice how in this snippet the `a` variable holds every different type of value, and that despite appearances, `typeof a` is not asking for the "type of `a`", but rather for the "type of the value currently in `a`." Only values have types in JavaScript; variables are just simple containers for those values.
-
-`typeof null` is an interesting case, because it errantly returns `"object"`, when you'd expect it to return `"null"`.
-
-**Warning:** This is a long-standing bug in JS, but one that is likely never going to be fixed. Too much code on the Web relies on the bug and thus fixing it would cause a lot more bugs!
-
-Also, note `a = undefined`. We're explicitly setting `a` to the `undefined` value, but that is behaviorally no different from a variable that has no value set yet, like with the `var a;` line at the top of the snippet. A variable can get to this "undefined" value state in several different ways, including functions that return no values and usage of the `void` operator.
+`typeof a` is not asking for the "type of `a`", but rather for the "type of the value currently in `a`." Only values have types in JavaScript; variables are just simple containers for those values.
 
 ### Objects
 
 The `object` type refers to a compound value where you can set properties (named locations) that each hold their own values of any type. This is perhaps one of the most useful value types in all of JavaScript.
-
-```js
-var obj = {
-	a: "hello world",
-	b: 42,
-	c: true
-};
-
-obj.a;		// "hello world"
-obj.b;		// 42
-obj.c;		// true
-
-obj["a"];	// "hello world"
-obj["b"];	// 42
-obj["c"];	// true
-```
-
-It may be helpful to think of this `obj` value visually:
-
-<img src="fig4.png">
-
-Properties can either be accessed with *dot notation* (i.e., `obj.a`) or *bracket notation* (i.e., `obj["a"]`). Dot notation is shorter and generally easier to read, and is thus preferred when possible.
-
-Bracket notation is useful if you have a property name that has special characters in it, like `obj["hello world!"]` -- such properties are often referred to as *keys* when accessed via bracket notation. The `[ ]` notation requires either a variable (explained next) or a `string` *literal* (which needs to be wrapped in `" .. "` or `' .. '`).
-
-Of course, bracket notation is also useful if you want to access a property/key but the name is stored in another variable, such as:
-
-```js
-var obj = {
-	a: "hello world",
-	b: 42
-};
-
-var b = "a";
-
-obj[b];			// "hello world"
-obj["b"];		// 42
-```
 
 **Note:** For more information on JavaScript `object`s, see the *this & Object Prototypes* title of this series, specifically Chapter 3.
 
@@ -107,32 +53,7 @@ There are a couple of other value types that you will commonly interact with in 
 
 An array is an `object` that holds values (of any type) not particularly in named properties/keys, but rather in numerically indexed positions. For example:
 
-```js
-var arr = [
-	"hello world",
-	42,
-	true
-];
-
-arr[0];			// "hello world"
-arr[1];			// 42
-arr[2];			// true
-arr.length;		// 3
-
-typeof arr;		// "object"
-```
-
-**Note:** Languages that start counting at zero, like JS does, use `0` as the index of the first element in the array.
-
-It may be helpful to think of `arr` visually:
-
-<img src="fig5.png">
-
 Because arrays are special objects (as `typeof` implies), they can also have properties, including the automatically updated `length` property.
-
-You theoretically could use an array as a normal object with your own named properties, or you could use an `object` but only give it numeric properties (`0`, `1`, etc.) similar to an array. However, this would generally be considered improper usage of the respective types.
-
-The best and most natural approach is to use arrays for numerically positioned values and use `object`s for named properties.
 
 #### Functions
 
@@ -189,35 +110,9 @@ We talked briefly about coercion in Chapter 1, but let's revisit it here.
 
 Coercion comes in two forms in JavaScript: *explicit* and *implicit*. Explicit coercion is simply that you can see obviously from the code that a conversion from one type to another will occur, whereas implicit coercion is when the type conversion can happen as more of a non-obvious side effect of some other operation.
 
-You've probably heard sentiments like "coercion is evil" drawn from the fact that there are clearly places where coercion can produce some surprising results. Perhaps nothing evokes frustration from developers more than when the language surprises them.
-
-Coercion is not evil, nor does it have to be surprising. In fact, the majority of cases you can construct with type coercion are quite sensible and understandable, and can even be used to *improve* the readability of your code. But we won't go much further into that debate -- Chapter 4 of the *Types & Grammar* title of this series covers all sides.
-
-Here's an example of *explicit* coercion:
-
-```js
-var a = "42";
-
-var b = Number( a );
-
-a;				// "42"
-b;				// 42 -- the number!
-```
-
-And here's an example of *implicit* coercion:
-
-```js
-var a = "42";
-
-var b = a * 1;	// "42" implicitly coerced to 42 here
-
-a;				// "42"
-b;				// 42 -- the number!
-```
+Chapter 4 of the *Types & Grammar* title of this series covers all sides.
 
 #### Truthy & Falsy
-
-In Chapter 1, we briefly mentioned the "truthy" and "falsy" nature of values: when a non-`boolean` value is coerced to a `boolean`, does it become `true` or `false`, respectively?
 
 The specific list of "falsy" values in JavaScript is as follows:
 
@@ -259,7 +154,7 @@ If you think about it, there's two possible ways `a == b` could give `true` via 
 
 The answer: `"42"` becomes `42`, to make the comparison `42 == 42`. In such a simple example, it doesn't really seem to matter which way that process goes, as the end result is the same. There are more complex cases where it matters not just what the end result of the comparison is, but *how* you get there.
 
-The `a === b` produces `false`, because the coercion is not allowed, so the simple value comparison obviously fails. Many developers feel that `===` is more predictable, so they advocate always using that form and staying away from `==`. I think this view is very shortsighted. I believe `==` is a powerful tool that helps your program, *if you take the time to learn how it works.*
+The `a === b` produces `false`, because the coercion is not allowed, so the simple value comparison obviously fails.
 
 We're not going to cover all the nitty-gritty details of how the coercion in `==` comparisons works here. Much of it is pretty sensible, but there are some important corner cases to be careful of. You can read section 11.9.3 of the ES5 specification (http://www.ecma-international.org/ecma-262/5.1/) to see the exact rules, and you'll be surprised at just how straightforward this mechanism is, compared to all the negative hype surrounding it.
 
@@ -268,8 +163,6 @@ To boil down a whole lot of details to a few simple takeaways, and help you know
 * If either value (aka side) in a comparison could be the `true` or `false` value, avoid `==` and use `===`.
 * If either value in a comparison could be one of these specific values (`0`, `""`, or `[]` -- empty array), avoid `==` and use `===`.
 * In *all* other cases, you're safe to use `==`. Not only is it safe, but in many cases it simplifies your code in a way that improves readability.
-
-What these rules boil down to is requiring you to think critically about your code and about what kinds of values can come through variables that get compared for equality. If you can be certain about the values, and `==` is safe, use it! If you can't be certain about the values, use `===`. It's that simple.
 
 The `!=` non-equality form pairs with `==`, and the `!==` form pairs with `===`. All the rules and observations we just discussed hold symmetrically for these non-equality comparisons.
 
@@ -310,21 +203,6 @@ b < c;		// true
 
 What happens here? In section 11.8.5 of the ES5 specification, it says that if both values in the `<` comparison are `string`s, as it is with `b < c`, the comparison is made lexicographically (aka alphabetically like a dictionary). But if one or both is not a `string`, as it is with `a < b`, then both values are coerced to be `number`s, and a typical numeric comparison occurs.
 
-The biggest gotcha you may run into here with comparisons between potentially different value types -- remember, there are no "strict inequality" forms to use -- is when one of the values cannot be made into a valid number, such as:
-
-```js
-var a = 42;
-var b = "foo";
-
-a < b;		// false
-a > b;		// false
-a == b;		// false
-```
-
-Wait, how can all three of those comparisons be `false`? Because the `b` value is being coerced to the "invalid number value" `NaN` in the `<` and `>` comparisons, and the specification says that `NaN` is neither greater-than nor less-than any other value.
-
-The `==` comparison fails for a different reason. `a == b` could fail if it's interpreted either as `42 == NaN` or `"42" == "foo"` -- as we explained earlier, the former is the case.
-
 **Note:** For more information about the inequality comparison rules, see section 11.8.5 of the ES5 specification and also consult Chapter 4 of the *Types & Grammar* title of this series.
 
 ## Variables
@@ -333,7 +211,7 @@ In JavaScript, variable names (including function names) must be valid *identifi
 
 An identifier must start with `a`-`z`, `A`-`Z`, `$`, or `_`. It can then contain any of those characters plus the numerals `0`-`9`.
 
-Generally, the same rules apply to a property name as to a variable identifier. However, certain words cannot be used as variables, but are OK as property names. These words are called "reserved words," and include the JS keywords (`for`, `in`, `if`, etc.) as well as `null`, `true`, and `false`.
+Generally, the same rules apply to a property name as to a variable identifier.
 
 **Note:** For more information about reserved words, see Appendix A of the *Types & Grammar* title of this series.
 
@@ -399,19 +277,6 @@ foo();
 
 Notice that `c` is not available inside of `bar()`, because it's declared only inside the inner `baz()` scope, and that `b` is not available to `foo()` for the same reason.
 
-If you try to access a variable's value in a scope where it's not available, you'll get a `ReferenceError` thrown. If you try to set a variable that hasn't been declared, you'll either end up creating a variable in the top-level global scope (bad!) or getting an error, depending on "strict mode" (see "Strict Mode"). Let's take a look:
-
-```js
-function foo() {
-	a = 1;	// `a` not formally declared
-}
-
-foo();
-a;			// 1 -- oops, auto global variable :(
-```
-
-This is a very bad practice. Don't do it! Always formally declare your variables.
-
 In addition to creating declarations for variables at the function level, ES6 *lets* you declare variables to belong to individual blocks (pairs of `{ .. }`), using the `let` keyword. Besides some nuanced details, the scoping rules will behave roughly the same as we just saw with functions:
 
 ```js
@@ -437,86 +302,6 @@ foo();
 Because of using `let` instead of `var`, `b` will belong only to the `if` statement and thus not to the whole `foo()` function's scope. Similarly, `c` belongs only to the `while` loop. Block scoping is very useful for managing your variable scopes in a more fine-grained fashion, which can make your code much easier to maintain over time.
 
 **Note:** For more information about scope, see the *Scope & Closures* title of this series. See the *ES6 & Beyond* title of this series for more information about `let` block scoping.
-
-## Conditionals
-
-In addition to the `if` statement we introduced briefly in Chapter 1, JavaScript provides a few other conditionals mechanisms that we should take a look at.
-
-Sometimes you may find yourself writing a series of `if..else..if` statements like this:
-
-```js
-if (a == 2) {
-	// do something
-}
-else if (a == 10) {
-	// do another thing
-}
-else if (a == 42) {
-	// do yet another thing
-}
-else {
-	// fallback to here
-}
-```
-
-This structure works, but it's a little verbose because you need to specify the `a` test for each case. Here's another option, the `switch` statement:
-
-```js
-switch (a) {
-	case 2:
-		// do something
-		break;
-	case 10:
-		// do another thing
-		break;
-	case 42:
-		// do yet another thing
-		break;
-	default:
-		// fallback to here
-}
-```
-
-The `break` is important if you want only the statement(s) in one `case` to run. If you omit `break` from a `case`, and that `case` matches or runs, execution will continue with the next `case`'s statements regardless of that `case` matching. This so called "fall through" is sometimes useful/desired:
-
-```js
-switch (a) {
-	case 2:
-	case 10:
-		// some cool stuff
-		break;
-	case 42:
-		// other stuff
-		break;
-	default:
-		// fallback
-}
-```
-
-Here, if `a` is either `2` or `10`, it will execute the "some cool stuff" code statements.
-
-Another form of conditional in JavaScript is the "conditional operator," often called the "ternary operator." It's like a more concise form of a single `if..else` statement, such as:
-
-```js
-var a = 42;
-
-var b = (a > 41) ? "hello" : "world";
-
-// similar to:
-
-// if (a > 41) {
-//    b = "hello";
-// }
-// else {
-//    b = "world";
-// }
-```
-
-If the test expression (`a > 41` here) evaluates as `true`, the first clause (`"hello"`) results, otherwise the second clause (`"world"`) results, and whatever the result is then gets assigned to `b`.
-
-The conditional operator doesn't have to be used in an assignment, but that's definitely the most common usage.
-
-**Note:** For more information about testing conditions and other patterns for `switch` and `? :`, see the *Types & Grammar* title of this series.
 
 ## Strict Mode
 
